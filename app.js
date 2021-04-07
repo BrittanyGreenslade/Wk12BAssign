@@ -27,7 +27,19 @@ function makePost() {
     body: postText,
   };
   let postJSON = JSON.stringify(postObject);
-  //send request
+
+  ajax.onloadstart = function loading() {
+    document.getElementById("loading").innerHTML = `<h2>Loading...</h2>`;
+    document.getElementById("loading").style.display = `block`;
+  };
+  ajax.onloadend = function loaded() {
+    document.getElementById("loading").style.display = `none`;
+  };
+  ajax.onerror = function () {
+    document.getElementById(
+      "loading"
+    ).innerHTML = `<h2>Sorry, we cannot complete your post</h2>`;
+  }; //send request
   ajax.send(postJSON);
 }
 //call the fn when the button is clicked
@@ -38,8 +50,10 @@ postNow.addEventListener("click", makePost);
 function updatePost() {
   let ajax = new XMLHttpRequest();
   ajax.onreadystatechange = function () {
-    if (this.readyState === 4 && this.status === 201) {
-      console.log(this.responseText);
+    if (this.readyState === 4 && this.status === 200) {
+      document.getElementById(
+        "successContainer"
+      ).innerHTML = `<h2>We've updated your post!</h2>`;
     }
   };
   //post is now given an ID once it's made
@@ -56,10 +70,24 @@ function updatePost() {
     title: postTitle,
     body: postText,
   };
+
   let postJSON = JSON.stringify(postObject);
+  ajax.onloadstart = function loading() {
+    document.getElementById("loading").innerHTML = `<h2>Loading...</h2>`;
+    document.getElementById("loading").style.display = `block`;
+  };
+  ajax.onloadend = function loaded() {
+    document.getElementById("loading").style.display = `none`;
+  };
+  ajax.onerror = function () {
+    document.getElementById(
+      "loading"
+    ).innerHTML = `<h2>Sorry, we cannot update your post</h2>`;
+  };
   //send request
   ajax.send(postJSON);
 }
+
 let updateBtn = document.getElementById("udpateBtn");
 updateBtn.addEventListener("click", updatePost);
 
@@ -67,11 +95,25 @@ function deletePost() {
   let ajax = new XMLHttpRequest();
   ajax.onreadystatechange = function () {
     if (this.readyState === 4 && this.status === 200) {
-      //   console.log(this.status);
+      document.getElementById(
+        "successContainer"
+      ).innerHTML = `<h2>We've deleted your post!</h2>`;
       console.log(this.responseText);
     }
   };
   ajax.open("DELETE", "https://jsonplaceholder.typicode.com/posts/1", true);
+  ajax.onloadstart = function loading() {
+    document.getElementById("loading").innerHTML = `<h2>Loading...</h2>`;
+    document.getElementById("loading").style.display = `block`;
+  };
+  ajax.onloadend = function loaded() {
+    document.getElementById("loading").style.display = `none`;
+  };
+  ajax.onerror = function () {
+    document.getElementById(
+      "loading"
+    ).innerHTML = `<h2>Sorry, we cannot update your post</h2>`;
+  };
   ajax.send();
 }
 let deleteBtn = document.getElementById("deleteBtn");
@@ -81,10 +123,7 @@ function getPosts() {
   let ajax = new XMLHttpRequest();
   ajax.onreadystatechange = function () {
     if (this.readyState === 4 && this.status === 200) {
-      //   console.log(this.responseText);
       let responseTxtObj = JSON.parse(this.responseText);
-      //   let responseTxtObj = this.responseText;
-      //   console.log(responseTxtObj);
       for (i = 0; i < responseTxtObj.length; i++) {
         let allTitles = responseTxtObj[i].title;
         let allPosts = responseTxtObj[i].body;
@@ -106,8 +145,33 @@ function getPosts() {
 let getPostsBtn = document.getElementById("getPostsBtn");
 window.addEventListener("load", getPosts);
 
-// let responseTxt = JSON.parse(this.responseText);
-// for (i = 0; i <= responseTxt.length; i++) {
-//   let postBody = responseTxt[i].body;
-//   console.log(postBody);
-// }
+function getComments() {
+  let ajax = new XMLHttpRequest();
+  ajax.onreadystatechange = function () {
+    if (this.readyState === 4 && this.status === 200) {
+      console.log(this.responseText);
+      let responseTxtObj = JSON.parse(this.responseText);
+      for (i = 0; i < responseTxtObj.length; i++) {
+        let postName = responseTxtObj[i].name;
+        document.getElementById(
+          "allPostsContainer"
+        ).innerHTML += `<h3>${postName}</h3>`;
+        let userEmail = responseTxtObj[i].email;
+        document.getElementById(
+          "allPostsContainer"
+        ).innerHTML += `<h3>${userEmail}</h3>`;
+      }
+    }
+  };
+  ajax.open(
+    "GET",
+    "https://jsonplaceholder.typicode.com/posts/1/comments",
+    true
+  );
+  ajax.send();
+}
+let commentsBtn = document.getElementById("comments");
+commentsBtn.addEventListener("click", getComments);
+
+//ask:
+//do we need to have all of the parts of the post? user ID, title, body, etc.
