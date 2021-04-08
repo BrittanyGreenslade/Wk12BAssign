@@ -1,4 +1,10 @@
-form {
+@mixin gridCentre {
   display: grid;
   place-items: center;
+}
+form {
+  display: grid;
+}
+article {
+  @include gridCentre();
 }
